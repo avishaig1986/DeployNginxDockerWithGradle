@@ -1,9 +1,9 @@
-  1. The following script pulls a nginx docker image, creates a container and starts it. 
+  1. The following Gradle script pulls a nginx docker image, creates a container and starts it. 
      In case a running nginx container already exists, it stops and removes it first.
 
-  2. The nginx site is mapped to port 8080
+  2. The nginx site is mapped to port 8080, therefore it can be accessed from http://localhost:8080
   
-  3. Site html content is located at /var/www/index.html and can be dynamically edited.
+  3. Html content is located at /var/www/index.html and can be dynamically edited.
 
   4. Command to execute: gradle initialize
   
