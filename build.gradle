@@ -1,0 +1,80 @@
+/*
+
+  1. The following script pulls a nginx docker image, creates a container and starts it. 
+     In case a running nginx container already exists, it stops and removes it first.
+
+  2. The nginx site is mapped to port 8080
+  
+  3. Site html content is located at /var/www/index.html and can be dynamically edited.
+
+  4. Command to execute: gradle initialize
+  
+  * Tested on centos-release-7-4.1708 with Gradle 4.10
+    Ubuntu default Gradle version is 3.4, so if you use ubuntu, in order to upgrade gradle do:
+	sudo add-apt-repository ppa:cwchien/gradle
+	sudo apt-get update
+	sudo apt upgrade gradle
+	
+  * Written by Avishai G as a home test for a DevOps position candidacy
+  
+*/
+
+plugins {
+
+	id "com.palantir.docker-run" version "0.20.1"
+    id "com.palantir.docker" version "0.20.1"
+}
+
+docker {
+    name 'nginx-image'
+    tags 'latest'
+    dockerfile file('Dockerfile')
+    pull true
+}
+
+dockerRun {
+    name 'nginx-container'
+    image 'nginx-image'
+    volumes '/var/www' : '/usr/share/nginx/html:ro'
+    ports '8080:80'
+    daemonize true
+}
+
+task Cleanup {
+	dependsOn 'dockerStop'
+    dependsOn 'dockerRemoveContainer'
+    
+    try { 
+		  tasks.findByName('dockerRemoveContainer').mustRunAfter 'dockerStop'
+		  tasks.findByName('docker').mustRunAfter 'dockerRemoveContainer'
+    }
+    catch (Exception ex){
+		  println("Could not clean previous the previous nginx container. Reason: "+ ex);
+		
+    }
+
+}
+
+task RunNginxDocker {
+
+	try {
+		  dependsOn 'docker'
+		  dependsOn 'dockerRun'
+		  dependsOn 'dockerRunStatus'
+
+		  tasks.findByName('dockerRun').mustRunAfter 'docker'
+		  tasks.findByName('dockerRunStatus').mustRunAfter 'dockerRun'
+    }
+    catch (Exception ex) {
+		  println("Could not install nginx docker. Reason: "+ ex);
+    }
+    
+}
+
+task initialize {
+    dependsOn 'Cleanup'
+    dependsOn 'RunNginxDocker'
+    
+    tasks.findByName('RunNginxDocker').mustRunAfter 'Cleanup'
+
+}
