@@ -7,7 +7,7 @@
 
   4. Command to execute: gradle initialize
   
-  * Tested on centos-release-7-4.1708 with Gradle 4.10 /r/n
+  * Tested on centos-release-7-4.1708 with Gradle 4.10.
     Ubuntu default Gradle version is 3.4, so if you use ubuntu, in order to upgrade gradle do:
 	sudo add-apt-repository ppa:cwchien/gradle
 	sudo apt-get update
